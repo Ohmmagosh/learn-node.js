@@ -21,8 +21,7 @@ router.get("/product/:id",(req,res)=>{
         res.sendFile(path.join(__dirname,"../webplate/product3.html"))
     }else{
         res.redirect("/")
-    }
-        
+    }        
 })
 
 module.exports = router
