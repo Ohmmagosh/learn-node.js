@@ -9,6 +9,6 @@ app.use(router)
 app.use(express.static(path.join(__dirname,'public')))
 
 
-app.listen(8080,'localhost',()=>{
-    console.log("start server in port 8080");
+app.listen(3000,'localhost',()=>{
+    console.log("start server in port 3000");
 })

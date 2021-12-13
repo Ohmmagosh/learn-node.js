@@ -14,11 +14,9 @@ router.get('/',(req,res)=>{
     ]
     res.render('index',{data:name, age:age, address:address, products:products,products2:products2})
 })
-
-router.get('/form',(req,res)=>{
-    res.render('form')
+router.get('/forms',(req,res)=>{
+    res.render('forms')
 })
-
 router.get('/manage',(req,res)=>{
     res.render('manage')
 })
