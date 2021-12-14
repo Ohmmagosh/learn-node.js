@@ -1,28 +1,48 @@
 //จัดการ Routing
 const express = require('express')
+const Product = require('../model/product')
 const router = express.Router()
 
+//อัพโหลดไฟล์
+const multer = require('multer')
+
+const storage = multer.diskStorage({
+    destination:function(req,file,cb){
+        cb(null,'./public/images/products')// ตำแหน่งจัดเก็บไฟล์
+    },
+    filename:function(req,file,cb){
+        cb(null,Date.now()+".jpg")//เปลี่ยนชื่อไฟล์เพื่อป้องกันไม่ให้ซ้ำกัน
+    }
+})
+
+const upload = multer({
+    storage:storage
+})
+
 router.get('/',(req,res)=>{
-    const name = "Ohmaaagoch"
-    const age = 23
-    const address = "<h2>bangkok</h2>"
-    const products = ["เสื้อ","พัดลม","ทีวี","ตู้เย็น","ผ้าม่าน","บ้านเด็ก","ชั้นเหล็กเก็บของ","แอร์"]
-    const products2 = [
-        {name:"Notebook",price:25000,image:"./images/products/product1.png"},
-        {name:"เสื้อ",price:2000,image:"./images/products/product2.png"},
-        {name:"หูฟัง",price:2500,image:"./images/products/product3.png"}
-    ]
-    res.render('index',{data:name, age:age, address:address, products:products,products2:products2})
+   Product.find().exec((err,doc)=>{
+       res.render('index',{product:doc})
+   })
 })
 router.get('/form',(req,res)=>{
     res.render('form')
 })
 router.get('/manage',(req,res)=>{
-    res.render('manage')
+    Product.find().exec((err,doc)=>{
+        res.render('manage',{product:doc})
+    })
 })
-router.post('/insert',(req,res)=>{
-    console.log(req.body);
-    res.render('form')
+router.post('/insert',upload.single('image'),(req,res)=>{
+    let data = new Product({
+        name:req.body.name,
+        price:req.body.price,
+        image:req.file.filename,
+        description:req.body.description
+    })
+    Product.saveProduct(data,(err)=>{
+        if(err) console.log(err)
+        res.redirect('/')
+    })
 })
 
 
