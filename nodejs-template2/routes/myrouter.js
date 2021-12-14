@@ -5,7 +5,9 @@ const router = express.Router()
 
 //อัพโหลดไฟล์
 const multer = require('multer')
-const { model } = require('mongoose')
+
+
+
 
 const storage = multer.diskStorage({
     destination:function(req,file,cb){
@@ -26,16 +28,30 @@ router.get('/',(req,res)=>{
    })
 })
 router.get('/add-product',(req,res)=>{
-    res.render('form')
+    if(req.session.login){
+        res.render('form')
+    }else {
+        res.render('admin')
+    }
 })
 router.get('/manage',(req,res)=>{
-    Product.find().exec((err,doc)=>{
-        res.render('manage',{product:doc})
-    })
+    if(req.session.login){
+        Product.find().exec((err,doc)=>{
+            res.render('manage',{product:doc})
+        })
+    }else{
+        res.render('admin')
+    }
 })
 router.get('/delete/:id',(req,res)=>{
     Product.findByIdAndDelete(req.params.id,{useFindAndModify:false}).exec(err=>{
         if(err) console.log(err);
+        res.redirect('/manage')
+    })
+})
+
+router.get('/logout',(req,res)=>{
+    req.session.destroy((err)=>{
         res.redirect('/manage')
     })
 })
@@ -77,5 +93,22 @@ router.get('/:id',(req,res)=>{
     })
 })
 
+
+router.post('/login',(req,res)=>{
+    const username = req.body.username
+    const password = req.body.password
+    const timeExpire = 30000
+
+    if(username === "admin" && password === "123"){
+        //สร้าง session
+        req.session.username = username
+        req.session.password = password
+        req.session.login = true
+        req.session.cookie.maxAge=timeExpire
+        res.redirect('/manage')
+    }else{
+        res.render('404')
+    }
+})
 
 module.exports = router
